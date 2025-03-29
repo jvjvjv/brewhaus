@@ -26,6 +26,17 @@ When developing for iOS or Android,
 
 Build and Deployment documentation to follow.
 
+## Known Issues
+
+A few issues were found that have not been addressed for this iteration and are outlined here.
+
+- In ApiQuery.spec.ts, a variable is used before it is assigned. This is on purpose to test a potential undefined parameter.
+  - The issue of a potentially undefined parameter can be resolved by a simple refactor, but should the ApiQuery module be transported and used elsewhere, it would still have to be handled.
+- Code formatting is not pretty and no steps have been taken to include any formatting rules yet.
+- API distance feature does not limit by distance, and this app does not triangulate locations or calculate that information.
+- API city search does not accept state or providence.
+- API does not return image of the brewery or a description. What is in place is not a very smart way to handle images or website copy.
+
 ## Open Source Packages
 
 Brewhaus could not come together without the help of the following packages:

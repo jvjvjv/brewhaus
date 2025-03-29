@@ -1,39 +1,64 @@
 import { createRouter, createWebHistory } from "@ionic/vue-router";
-import { RouteRecordRaw } from "vue-router";
-import TabsPage from "../views/TabsPage.vue";
+import type { RouteRecordRaw } from "vue-router";
 
-const routes: Array<RouteRecordRaw> = [
+import TabsLayout from "@/layouts/TabsLayout.vue";
+import HomePage from "@/pages/home/HomePage.vue";
+import SearchPage from "@/pages/search/SearchPage.vue";
+import FriendsPage from "@/pages/friends/FriendsPage.vue";
+
+const homeRoute: RouteRecordRaw = {
+  path: "home",
+  component: () => HomePage,
+  meta: {
+    title: "Find local breweries and see what's on tap! | Home",
+  },
+};
+
+const searchRoute: RouteRecordRaw = {
+  path: "search",
+  component: () => SearchPage,
+  meta: {
+    title: "Search for a Brewery Near You! | Search",
+  },
+};
+
+const friendsRoute: RouteRecordRaw = {
+  path: "friends",
+  component: () => FriendsPage,
+  meta: {
+    title: "See what your friends are drinking! | Friends",
+  },
+};
+
+const tabRoutes: Array<RouteRecordRaw> = [
   {
     path: "/",
     redirect: "/tabs/home",
   },
   {
     path: "/tabs/",
-    component: TabsPage,
+    component: TabsLayout,
     children: [
       {
         path: "",
         redirect: "/tabs/home",
       },
-      {
-        path: "home",
-        component: () => import("@/views/HomePage.vue"),
-      },
-      {
-        path: "search",
-        component: () => import("@/views/SearchPage.vue"),
-      },
-      {
-        path: "friends",
-        component: () => import("@/views/FriendsPage.vue"),
-      },
+      homeRoute,
+      searchRoute,
+      friendsRoute,
     ],
   },
 ];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes,
+  routes: [...tabRoutes],
 });
 
 export default router;
+
+declare module "vue-router" {
+  interface RouteMeta {
+    title: string;
+  }
+}
