@@ -7,26 +7,32 @@ import SearchPage from "@/pages/search/SearchPage.vue";
 import FriendsPage from "@/pages/friends/FriendsPage.vue";
 
 const homeRoute: RouteRecordRaw = {
+  name: "home",
   path: "home",
-  component: () => HomePage,
+  component: HomePage,
   meta: {
-    title: "Find local breweries and see what's on tap! | Home",
+    title: "Home",
+    tagline: "Find local breweries and see what's on tap!",
   },
 };
 
 const searchRoute: RouteRecordRaw = {
+  name: "search",
   path: "search",
-  component: () => SearchPage,
+  component: SearchPage,
   meta: {
-    title: "Search for a Brewery Near You! | Search",
+    title: "Search",
+    tagline: "Search for a Brewery Near You!",
   },
 };
 
 const friendsRoute: RouteRecordRaw = {
+  name: "friends",
   path: "friends",
-  component: () => FriendsPage,
+  component: FriendsPage,
   meta: {
-    title: "See what your friends are drinking! | Friends",
+    title: "Friends",
+    tagline: "See what your friends are drinking!",
   },
 };
 
@@ -60,5 +66,6 @@ export default router;
 declare module "vue-router" {
   interface RouteMeta {
     title: string;
+    tagline?: string;
   }
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import type {
@@ -7,25 +7,16 @@ import type {
   SearchbarCustomEvent,
 } from "@ionic/vue";
 import {
-  IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
   IonSegment,
   IonSegmentButton,
   IonSearchbar,
   IonButton,
   IonIcon,
-  IonList,
-  IonItem,
   IonCard,
   IonCardHeader,
   IonCardTitle,
   IonCardContent,
   IonLabel,
-  IonInfiniteScroll,
-  IonInfiniteScrollContent,
   IonAlert,
 } from "@ionic/vue";
 import { search, locateOutline, locationOutline } from "ionicons/icons";
@@ -37,6 +28,8 @@ import useLocation from "@/utils/useLocation";
 import useRouteMeta from "@/utils/useRouteMeta";
 import useWebsiteMetadata from "@/utils/useWebsiteMetadata";
 
+import TabWrapper from "@/components/TabWrapper.vue";
+import LazyList from "@/components/LazyList.vue";
 import BreweryDetailCard from "@/components/BreweryDetailCard.vue";
 
 const gps = useLocation();
@@ -46,17 +39,24 @@ const { pageTitle } = useRouteMeta(route);
 const disableInfiniteScroll = ref(false);
 const searchBy = ref<"name" | "location">("name");
 const searchTerm = ref("");
+watch(searchBy, () => {
+  searchTerm.value = "";
+});
 const searchPage = ref(1);
 const searchIcon = computed(() =>
   searchBy.value === "name" ? search : locationOutline
 );
-
 const searchQuery = computed(() => ({
   page: searchPage.value,
-  [searchBy.value == "name" ? "by_name" : "by_city"]: searchTerm.value,
+  [searchBy.value == "name"
+    ? "by_name"
+    : /^[A-Za-z0-9\- ]{2,10}$/.test(searchTerm.value)
+    ? "by_postal"
+    : "by_city"]: searchTerm.value,
 }));
 const breweries = ref<IBrewery[]>([]);
 const selectedBrewery = ref<IBrewery | null>(null);
+const selectedBreweryFailedToFetch = ref(false);
 const pageError = ref<string | null>(null);
 
 const doToggleSearchBy = (e: CustomEvent) => {
@@ -66,7 +66,6 @@ const doToggleSearchBy = (e: CustomEvent) => {
 };
 
 const doSearchBy = async (e: SearchbarCustomEvent) => {
-  console.log("...");
   searchTerm.value = (e.target as HTMLIonSearchbarElement).value || "";
   if (searchTerm.value.length > 2) {
     try {
@@ -118,125 +117,109 @@ const doSelect = async (brewery: IBrewery) => {
   selectedBrewery.value = brewery;
   if (selectedBrewery.value.description) return;
   if (brewery.website_url) {
-    const { description, image } = await useWebsiteMetadata(
-      brewery.website_url
-    );
-    if (description) selectedBrewery.value.description = [description];
-    if (image) selectedBrewery.value.image = image;
-    console.log(
-      image,
-      description,
-      selectedBrewery.value.name,
-      await useWebsiteMetadata(brewery.website_url)
-    );
+    try {
+      const { status, description, image } = await useWebsiteMetadata(
+        brewery.website_url
+      );
+      selectedBreweryFailedToFetch.value = status == "error";
+      if (description) selectedBrewery.value.description = [description];
+      if (image) selectedBrewery.value.image = image;
+      return;
+    } catch (e) {
+      console.error("Error fetching website metadata:", e);
+    }
   }
   selectedBrewery.value.description = await getIpsum();
 };
 </script>
 
 <template>
-  <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>{{ pageTitle }}</ion-title>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content>
-      <ion-segment
-        :value="searchBy"
-        @ionChange="doToggleSearchBy"
-      >
-        <ion-segment-button value="name">
-          <ion-label>by Name</ion-label>
-        </ion-segment-button>
-        <ion-segment-button value="location">
-          <ion-label>by Location</ion-label>
-        </ion-segment-button>
-      </ion-segment>
-      <ion-searchbar
-        :debounce="500"
-        :search-icon="searchIcon"
-        :enterkeyhint="'search'"
-        :autocomplete="searchBy == 'name' ? 'off' : 'address-level2'"
-        :placeholder="`Search by ${searchBy == 'name' ? 'name' : 'city'}...`"
-        @ionInput="($event) => doSearchBy($event)"
+  <tab-wrapper :page-title="pageTitle">
+    <ion-segment
+      :value="searchBy"
+      @ionChange="doToggleSearchBy"
+    >
+      <ion-segment-button value="name">
+        <ion-label>by Name</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="location">
+        <ion-label>by Location</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+    <ion-searchbar
+      :debounce="500"
+      :search-icon="searchIcon"
+      :enterkeyhint="'search'"
+      :autocomplete="searchBy == 'name' ? 'off' : 'address-level2'"
+      :placeholder="`Search by ${
+        searchBy == 'name' ? 'name' : 'city or ZIP code'
+      }...`"
+      :value="searchTerm"
+      @ionInput="($event) => doSearchBy($event)"
+    />
+    <ion-button
+      v-if="searchBy == 'location' && gps.isGeolocationAvailable"
+      expand="full"
+      size="small"
+      @click="doSearchByLocation"
+    >
+      <ion-icon
+        slot="start"
+        :icon="locateOutline"
       />
-      <ion-button
-        v-if="searchBy == 'location' && gps.isGeolocationAvailable"
-        expand="full"
-        size="small"
-        @click="doSearchByLocation"
-      >
-        <ion-icon
-          slot="start"
-          :icon="locateOutline"
-        />
-        Search near you
-      </ion-button>
+      Search near you
+    </ion-button>
 
-      <div
-        class="search-results"
-        v-if="breweries.length"
-      >
-        <ion-list>
-          <ion-item
-            v-for="brewery in breweries"
-            :key="brewery.id"
-            @click="doSelect(brewery)"
-          >
-            <ion-label>
-              <brewery-detail-card
-                v-if="selectedBrewery?.id == brewery.id"
-                :brewery="brewery"
-              />
-              <template v-else>
-                <h2>{{ brewery.name }}</h2>
-                <p>{{ brewery.city }}, {{ brewery.state }}</p>
-              </template>
-            </ion-label>
-          </ion-item>
-        </ion-list>
-        <ion-infinite-scroll
-          :disabled="disableInfiniteScroll"
-          @ionInfinite="doInfinite"
-        >
-          <ion-infinite-scroll-content
-            loadingSpinner="bubbles"
-            loadingText="Loading more data..."
-          ></ion-infinite-scroll-content>
-        </ion-infinite-scroll>
-      </div>
-      <div v-else>
-        <ion-card v-if="searchBy == 'name'">
-          <ion-card-header>
-            <ion-card-title>Search for breweries</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <p>
-              Enter a name or city to search for breweries. Click on a brewery
-              to see more details.
-            </p>
-          </ion-card-content>
-        </ion-card>
-        <ion-card v-if="searchBy == 'location'">
-          <ion-card-header>
-            <ion-card-title>Search by location</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <p>
-              Click the button to search for breweries near your location, or
-              enter your city. Click on a brewery to see more details.
-            </p>
-          </ion-card-content>
-        </ion-card>
-      </div>
-      <ion-alert
-        :is-open="pageError"
-        :message="pageError"
-        :buttons="['OK']"
-        header="Something bad happened"
-        @didDismiss="pageError = null"
-      />
-    </ion-content>
-  </ion-page>
+    <lazy-List
+      v-if="breweries.length"
+      :items="breweries"
+      :disable-infinite-scroll="disableInfiniteScroll"
+      :on-load-data="doInfinite"
+      class="search-results"
+      @item-click="doSelect"
+    >
+      <template v-slot="{ item: brewery }">
+        <brewery-detail-card
+          v-if="selectedBrewery?.id == brewery.id"
+          :brewery="brewery"
+          :invalid-url="selectedBreweryFailedToFetch"
+        />
+        <template v-else>
+          <h2>{{ brewery.name }}</h2>
+          <p>{{ brewery.city }}, {{ brewery.state }}</p>
+        </template>
+      </template>
+    </lazy-List>
+    <div v-else>
+      <ion-card v-if="searchBy == 'name'">
+        <ion-card-header>
+          <ion-card-title>Search for breweries</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>
+            Enter a name or city to search for breweries. Click on a brewery to
+            see more details.
+          </p>
+        </ion-card-content>
+      </ion-card>
+      <ion-card v-if="searchBy == 'location'">
+        <ion-card-header>
+          <ion-card-title>Search by location</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>
+            Click the button to search for breweries near your location, or
+            enter your city. Click on a brewery to see more details.
+          </p>
+        </ion-card-content>
+      </ion-card>
+    </div>
+    <ion-alert
+      :is-open="pageError"
+      :message="pageError"
+      :buttons="['OK']"
+      header="Something bad happened"
+      @didDismiss="pageError = null"
+    />
+  </tab-wrapper>
 </template>

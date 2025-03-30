@@ -26,6 +26,9 @@ const microBreweryMap = new Map<string, string>([
   ["proprietor", "Proprietor Brewery"],
   ["closed", "Closed Brewery"],
 ]);
+
+const formatPhone = (phone: string) =>
+  phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3");
 </script>
 
 <template>
@@ -55,19 +58,30 @@ const microBreweryMap = new Map<string, string>([
         {{ brewery.city }}, {{ brewery.state }}
         {{ brewery.postal_code }}
       </p>
-      <h2><strong>Phone</strong></h2>
-      <p>
-        <a :href="`tel:${brewery.phone}`">{{ brewery.phone }}</a>
-      </p>
-      <h2><strong>Website</strong></h2>
-      <p>
-        <a
-          :href="brewery.website_url"
-          target="_blank"
-        >
-          {{ brewery.website_url }}
-        </a>
-      </p>
+      <template v-if="brewery.phone">
+        <h2><strong>Phone</strong></h2>
+        <p @click="(e) => e.stopPropagation()">
+          <a :href="`tel:${brewery.phone}`">{{ formatPhone(brewery.phone) }}</a>
+        </p>
+      </template>
+      <template v-if="brewery.website_url">
+        <h2><strong>Website</strong></h2>
+        <p @click="(e) => e.stopPropagation()">
+          <a
+            :href="brewery.website_url"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ brewery.website_url }}
+          </a>
+        </p>
+      </template>
     </ion-card-content>
   </ion-card>
 </template>
+
+<style scoped>
+.strike {
+  text-decoration: line-through;
+}
+</style>

@@ -1,6 +1,7 @@
 import { getWebsite } from "@/api";
 
 interface IWebsiteMetadata {
+  status?: "success" | "empty" | "error";
   title?: string;
   description?: string;
   image?: string;
@@ -15,13 +16,15 @@ export default async function useWebsiteMetadata(
     response = await getWebsite(url);
   } catch (error) {
     console.error("Error fetching website metadata:", error);
-    throw error;
+    result.status = "error";
+    return result;
   }
   const allMeta =
     /<meta (?:http-equiv|itemprop|property|name)="(?<prop>(?:og|twitter)?[^"]+?)" content="(?<content>[^"]+)(?!\\)"[^>]*?>/g;
   const matches = response.matchAll(allMeta);
   console.log(response, matches);
   if (!matches) {
+    result.status = "empty";
     return result;
   }
 
@@ -46,6 +49,6 @@ export default async function useWebsiteMetadata(
         break;
     }
   }
-  console.log(result);
+  result.status = "success";
   return result;
 }

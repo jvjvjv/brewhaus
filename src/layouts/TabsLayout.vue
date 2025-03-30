@@ -24,21 +24,24 @@ import type { INavigationTab } from "@/types";
 
 const route = useRoute();
 
+const chooseIcon = (path: string, activeIcon: string, inactiveIcon: string) =>
+  route.path == path ? activeIcon : inactiveIcon;
+
 const tabs = computed(
   (): Array<INavigationTab> => [
     {
       name: "home",
-      icon: route.path == "/tabs/home" ? beer : beerOutline,
+      icon: chooseIcon("/tabs/home", beer, beerOutline),
       label: "Home",
     },
     {
       name: "search",
-      icon: route.path == "/tabs/search" ? search : searchOutline,
+      icon: chooseIcon("/tabs/search", search, searchOutline),
       label: "Search",
     },
     {
       name: "friends",
-      icon: route.path == "/tabs/friends" ? peopleCircle : peopleCircleOutline,
+      icon: chooseIcon("/tabs/friends", peopleCircle, peopleCircleOutline),
       label: "Friends",
     },
   ]

@@ -4,13 +4,20 @@ import type { RouteLocationNormalized } from "vue-router";
 // const route = useRoute();
 
 export default function useRouteMeta(currentRoute: RouteLocationNormalized) {
-  const routeMeta = currentRoute.meta;
-  const pageTitle = ref(routeMeta.title || "Your gateway to a great night!");
+  const pageTitle = ref();
+  const pageTagline = ref();
+  const setTitle = (newTitle: string, newTagline?: string) => {
+    pageTitle.value = newTitle ?? "";
+    pageTagline.value = newTagline || "";
+    let title = "";
+    if (pageTitle.value) title = `${pageTitle.value}`;
+    if (pageTagline.value) title = `${title} - ${pageTagline.value}`;
+    title += " | Brewhaus";
 
-  const setTitle = (newTitle: string) => {
-    pageTitle.value = newTitle;
-    window.document.title = `${pageTitle.value} | Brewhaus`;
+    window.document.title = title;
   };
+  const routeMeta = currentRoute.meta;
+  setTitle(routeMeta?.title || "", routeMeta?.tagline || "");
 
-  return { setTitle, pageTitle };
+  return { setTitle, pageTitle, pageTagline };
 }
