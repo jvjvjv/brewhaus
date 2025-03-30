@@ -1,0 +1,51 @@
+import { getWebsite } from "@/api";
+
+interface IWebsiteMetadata {
+  title?: string;
+  description?: string;
+  image?: string;
+}
+
+export default async function useWebsiteMetadata(
+  url: string
+): Promise<IWebsiteMetadata> {
+  const result: IWebsiteMetadata = {};
+  let response;
+  try {
+    response = await getWebsite(url);
+  } catch (error) {
+    console.error("Error fetching website metadata:", error);
+    throw error;
+  }
+  const allMeta =
+    /<meta (?:http-equiv|itemprop|property|name)="(?<prop>(?:og|twitter)?[^"]+?)" content="(?<content>[^"]+)(?!\\)"[^>]*?>/g;
+  const matches = response.matchAll(allMeta);
+  console.log(response, matches);
+  if (!matches) {
+    return result;
+  }
+
+  // Prefer OG tags over Twitter tags
+  for (const match of matches) {
+    if (!match.groups) continue;
+    const { prop, content } = match.groups;
+    switch (prop) {
+      case "title":
+      case "og:title":
+      case "twitter:title":
+        result.title = content;
+        break;
+      case "description":
+      case "og:description":
+      case "twitter:description":
+        result.description = content;
+        break;
+      case "og:image":
+      case "twitter:image":
+        result.image = content;
+        break;
+    }
+  }
+  console.log(result);
+  return result;
+}

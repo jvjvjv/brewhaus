@@ -38,6 +38,20 @@ export const getBreweries = async (
 export const searchBreweries = async (query: string): Promise<IBrewery[]> =>
   await apiCall("get", `breweries/search?query=${query}`);
 
+export const getWebsite = async (url: string): Promise<string> => {
+  const response = await fetch(url, {
+    mode: "cors",
+    method: "GET",
+  });
+  if (!response.ok) {
+    // throw new Error(`Error fetching website: ${response.statusText}`);
+    console.error(`Error fetching website: ${response.statusText}`);
+    return "";
+  }
+  return await response.text();
+  ``;
+};
+
 export const getIpsum = async (): Promise<string[]> =>
   await apiCall<string[]>(
     "get",

@@ -2,7 +2,10 @@
 import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
 
-import type { InfiniteScrollCustomEvent } from "@ionic/vue";
+import type {
+  InfiniteScrollCustomEvent,
+  SearchbarCustomEvent,
+} from "@ionic/vue";
 import {
   IonPage,
   IonHeader,
@@ -19,7 +22,6 @@ import {
   IonCard,
   IonCardHeader,
   IonCardTitle,
-  IonCardSubtitle,
   IonCardContent,
   IonLabel,
   IonInfiniteScroll,
@@ -31,26 +33,17 @@ import { search, locateOutline, locationOutline } from "ionicons/icons";
 import type { IBrewery } from "@/types";
 
 import { getBreweries, getIpsum } from "@/api";
-import useRouteMeta from "@/utils/useRouteMeta";
 import useLocation from "@/utils/useLocation";
+import useRouteMeta from "@/utils/useRouteMeta";
+import useWebsiteMetadata from "@/utils/useWebsiteMetadata";
 
-const microBreweryMap = new Map<string, string>([
-  ["micro", "Micro Brewery"],
-  ["nano", "Nanobrewery"],
-  ["regional", "Regional Brewery"],
-  ["brewpub", "Brewpub"],
-  ["large", "Large Brewery"],
-  ["planning", "Planning Brewery"],
-  ["bar", "Bar"],
-  ["contract", "Contract Brewery"],
-  ["proprietor", "Proprietor Brewery"],
-  ["closed", "Closed Brewery"],
-]);
+import BreweryDetailCard from "@/components/BreweryDetailCard.vue";
 
 const gps = useLocation();
 const route = useRoute();
 const { pageTitle } = useRouteMeta(route);
 
+const disableInfiniteScroll = ref(false);
 const searchBy = ref<"name" | "location">("name");
 const searchTerm = ref("");
 const searchPage = ref(1);
@@ -72,8 +65,9 @@ const doToggleSearchBy = (e: CustomEvent) => {
   breweries.value = [];
 };
 
-const doSearchBy = async (e: InputEvent) => {
-  searchTerm.value = (e.target as HTMLInputElement).value;
+const doSearchBy = async (e: SearchbarCustomEvent) => {
+  console.log("...");
+  searchTerm.value = (e.target as HTMLIonSearchbarElement).value || "";
   if (searchTerm.value.length > 2) {
     try {
       const results = await getBreweries(searchQuery.value);
@@ -109,6 +103,7 @@ const doInfinite = async (e: InfiniteScrollCustomEvent) => {
   const results = await getBreweries(searchQuery.value);
   if (results.length === 0) {
     e.target.complete();
+    disableInfiniteScroll.value = true;
     return;
   }
   breweries.value.push(...results);
@@ -122,6 +117,19 @@ const doSelect = async (brewery: IBrewery) => {
   }
   selectedBrewery.value = brewery;
   if (selectedBrewery.value.description) return;
+  if (brewery.website_url) {
+    const { description, image } = await useWebsiteMetadata(
+      brewery.website_url
+    );
+    if (description) selectedBrewery.value.description = [description];
+    if (image) selectedBrewery.value.image = image;
+    console.log(
+      image,
+      description,
+      selectedBrewery.value.name,
+      await useWebsiteMetadata(brewery.website_url)
+    );
+  }
   selectedBrewery.value.description = await getIpsum();
 };
 </script>
@@ -151,7 +159,7 @@ const doSelect = async (brewery: IBrewery) => {
         :enterkeyhint="'search'"
         :autocomplete="searchBy == 'name' ? 'off' : 'address-level2'"
         :placeholder="`Search by ${searchBy == 'name' ? 'name' : 'city'}...`"
-        @ionInput="void doSearchBy"
+        @ionInput="($event) => doSearchBy($event)"
       />
       <ion-button
         v-if="searchBy == 'location' && gps.isGeolocationAvailable"
@@ -177,42 +185,10 @@ const doSelect = async (brewery: IBrewery) => {
             @click="doSelect(brewery)"
           >
             <ion-label>
-              <ion-card v-if="selectedBrewery?.id == brewery.id">
-                <ion-card-header>
-                  <ion-card-title>{{ selectedBrewery.name }}</ion-card-title>
-                  <ion-card-subtitle>
-                    {{ microBreweryMap.get(brewery.brewery_type) }}
-                  </ion-card-subtitle>
-                </ion-card-header>
-                <ion-card-content>
-                  <p
-                    v-for="(p, i) of brewery.description"
-                    :key="i"
-                  >
-                    {{ p }}
-                  </p>
-                  <hr />
-                  <h2><strong>Address</strong></h2>
-                  <p>
-                    {{ brewery.street }}<br />
-                    {{ brewery.city }}, {{ brewery.state }}
-                    {{ brewery.postal_code }}
-                  </p>
-                  <h2><strong>Phone</strong></h2>
-                  <p>
-                    <a :href="`tel:${brewery.phone}`">{{ brewery.phone }}</a>
-                  </p>
-                  <h2><strong>Website</strong></h2>
-                  <p>
-                    <a
-                      :href="brewery.website_url"
-                      target="_blank"
-                    >
-                      {{ brewery.website_url }}
-                    </a>
-                  </p>
-                </ion-card-content>
-              </ion-card>
+              <brewery-detail-card
+                v-if="selectedBrewery?.id == brewery.id"
+                :brewery="brewery"
+              />
               <template v-else>
                 <h2>{{ brewery.name }}</h2>
                 <p>{{ brewery.city }}, {{ brewery.state }}</p>
@@ -220,7 +196,10 @@ const doSelect = async (brewery: IBrewery) => {
             </ion-label>
           </ion-item>
         </ion-list>
-        <ion-infinite-scroll @ionInfinite="doInfinite">
+        <ion-infinite-scroll
+          :disabled="disableInfiniteScroll"
+          @ionInfinite="doInfinite"
+        >
           <ion-infinite-scroll-content
             loadingSpinner="bubbles"
             loadingText="Loading more data..."

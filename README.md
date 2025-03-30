@@ -32,6 +32,7 @@ A few issues were found that have not been addressed for this iteration and are 
 
 - In ApiQuery.spec.ts, a variable is used before it is assigned. This is on purpose to test a potential undefined parameter.
   - The issue of a potentially undefined parameter can be resolved by a simple refactor, but should the ApiQuery module be transported and used elsewhere, it would still have to be handled.
+- There is no user feedback when "Search near me" has been clicked or when any API request is in progress.
 - Code formatting is not pretty and no steps have been taken to include any formatting rules yet.
 - API distance feature does not limit by distance, and this app does not triangulate locations or calculate that information.
 - API city search does not accept state or providence.
@@ -44,6 +45,7 @@ Brewhaus could not come together without the help of the following packages:
 - [Open Brewery DB](https://www.openbrewerydb.org/) - A free dataset and API with public information on breweries, cideries, brewpubs, and bottleshops!
 - [Ionic](https://ionicframework.com/) - An open source UI toolkit for building performant, high-quality mobile apps using web technologies.
 - [Axios](https://axios-http.com/docs/api_intro) - The most widely-used HTTP client for node.js<sup>&dagger;</sup>!
+- [Bacon Ipsum](https://baconipsum.com/json-api/) - For a more _inspired_ placeholder text.
 
 ## Imagery
 

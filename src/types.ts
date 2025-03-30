@@ -26,6 +26,7 @@ export interface IBrewery {
   name: string;
   brewery_type: BreweryType;
   description?: string[]; // Added to store a Lorem Ipsum description
+  image?: string;
   address_1: string;
   address_2: string;
   address_3: string;
