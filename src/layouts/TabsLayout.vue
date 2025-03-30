@@ -31,17 +31,17 @@ const tabs = computed(
   (): Array<INavigationTab> => [
     {
       name: "home",
-      icon: chooseIcon("/tabs/home", beer, beerOutline),
+      icon: chooseIcon("/home", beer, beerOutline),
       label: "Home",
     },
     {
       name: "search",
-      icon: chooseIcon("/tabs/search", search, searchOutline),
+      icon: chooseIcon("/search", search, searchOutline),
       label: "Search",
     },
     {
       name: "friends",
-      icon: chooseIcon("/tabs/friends", peopleCircle, peopleCircleOutline),
+      icon: chooseIcon("/friends", peopleCircle, peopleCircleOutline),
       label: "Friends",
     },
   ]
@@ -57,7 +57,7 @@ const tabs = computed(
           v-for="tab in tabs"
           :key="tab.name"
           :tab="tab.name"
-          :href="`/tabs/${tab.name}`"
+          :href="`/${tab.name}`"
         >
           <ion-icon
             aria-hidden="true"

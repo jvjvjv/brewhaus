@@ -2,34 +2,34 @@ import { createRouter, createWebHistory } from "@ionic/vue-router";
 import type { RouteRecordRaw } from "vue-router";
 
 import TabsLayout from "@/layouts/TabsLayout.vue";
-import HomePage from "@/pages/home/HomePage.vue";
-import SearchPage from "@/pages/search/SearchPage.vue";
-import FriendsPage from "@/pages/friends/FriendsPage.vue";
+import HomeTab from "@/pages/home/HomeTab.vue";
+import SearchTab from "@/pages/search/SearchTab.vue";
+import FriendsTab from "@/pages/friends/FriendsTab.vue";
 
-const homeRoute: RouteRecordRaw = {
+const homeRouteTab: RouteRecordRaw = {
   name: "home",
   path: "home",
-  component: HomePage,
+  component: HomeTab,
   meta: {
     title: "Home",
     tagline: "Find local breweries and see what's on tap!",
   },
 };
 
-const searchRoute: RouteRecordRaw = {
+const searchRouteTab: RouteRecordRaw = {
   name: "search",
   path: "search",
-  component: SearchPage,
+  component: SearchTab,
   meta: {
     title: "Search",
     tagline: "Search for a Brewery Near You!",
   },
 };
 
-const friendsRoute: RouteRecordRaw = {
+const friendsRouteTab: RouteRecordRaw = {
   name: "friends",
   path: "friends",
-  component: FriendsPage,
+  component: FriendsTab,
   meta: {
     title: "Friends",
     tagline: "See what your friends are drinking!",
@@ -39,19 +39,15 @@ const friendsRoute: RouteRecordRaw = {
 const tabRoutes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    redirect: "/tabs/home",
-  },
-  {
-    path: "/tabs/",
     component: TabsLayout,
     children: [
       {
         path: "",
-        redirect: "/tabs/home",
+        redirect: "/home",
       },
-      homeRoute,
-      searchRoute,
-      friendsRoute,
+      homeRouteTab,
+      searchRouteTab,
+      friendsRouteTab,
     ],
   },
 ];

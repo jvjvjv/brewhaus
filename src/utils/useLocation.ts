@@ -1,4 +1,4 @@
-export default function useLocation() {
+export function useLocation() {
   const { geolocation } = navigator;
   const isGeolocationAvailable = !!geolocation;
   const getCurrentPosition = (): Promise<GeolocationPosition> => {

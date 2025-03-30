@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import useWebsiteMetadata from "./useWebsiteMetadata";
+import { useWebsiteMetadata } from "./useWebsiteMetadata";
 
 // This is an example of a bad test because it makes an actual network request
 // instead of mocking the data. This is done intentionally. As of 2025-03-29 the

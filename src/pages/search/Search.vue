@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { useRoute } from "vue-router";
 
 import type {
   InfiniteScrollCustomEvent,
   SearchbarCustomEvent,
 } from "@ionic/vue";
+
 import {
   IonSegment,
   IonSegmentButton,
@@ -19,22 +19,21 @@ import {
   IonLabel,
   IonAlert,
 } from "@ionic/vue";
-import { search, locateOutline, locationOutline } from "ionicons/icons";
+
+import { locateOutline } from "ionicons/icons";
+
+import LazyList from "@/components/LazyList.vue";
+import BreweryDetailCard from "@/components/BreweryDetailCard.vue";
+
+import { search, locationOutline } from "ionicons/icons";
 
 import type { IBrewery } from "@/types";
 
 import { getBreweries, getIpsum } from "@/api";
-import useLocation from "@/utils/useLocation";
-import useRouteMeta from "@/utils/useRouteMeta";
-import useWebsiteMetadata from "@/utils/useWebsiteMetadata";
-
-import TabWrapper from "@/components/TabWrapper.vue";
-import LazyList from "@/components/LazyList.vue";
-import BreweryDetailCard from "@/components/BreweryDetailCard.vue";
+import { useLocation } from "@/utils/useLocation";
+import { useWebsiteMetadata } from "@/utils/useWebsiteMetadata";
 
 const gps = useLocation();
-const route = useRoute();
-const { pageTitle } = useRouteMeta(route);
 
 const disableInfiniteScroll = ref(false);
 const searchBy = ref<"name" | "location">("name");
@@ -134,7 +133,7 @@ const doSelect = async (brewery: IBrewery) => {
 </script>
 
 <template>
-  <tab-wrapper :page-title="pageTitle">
+  <div>
     <ion-segment
       :value="searchBy"
       @ionChange="doToggleSearchBy"
@@ -221,5 +220,5 @@ const doSelect = async (brewery: IBrewery) => {
       header="Something bad happened"
       @didDismiss="pageError = null"
     />
-  </tab-wrapper>
+  </div>
 </template>

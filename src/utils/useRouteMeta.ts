@@ -3,7 +3,7 @@ import type { RouteLocationNormalized } from "vue-router";
 
 // const route = useRoute();
 
-export default function useRouteMeta(currentRoute: RouteLocationNormalized) {
+export function useRouteMeta(currentRoute: RouteLocationNormalized) {
   const pageTitle = ref();
   const pageTagline = ref();
   const setTitle = (newTitle: string, newTagline?: string) => {

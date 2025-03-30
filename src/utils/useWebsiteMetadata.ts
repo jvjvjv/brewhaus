@@ -7,7 +7,7 @@ interface IWebsiteMetadata {
   image?: string;
 }
 
-export default async function useWebsiteMetadata(
+export async function useWebsiteMetadata(
   url: string
 ): Promise<IWebsiteMetadata> {
   const result: IWebsiteMetadata = {};

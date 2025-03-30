@@ -16,15 +16,15 @@ defineProps<{
 
 const microBreweryMap = new Map<string, string>([
   ["micro", "Micro Brewery"],
-  ["nano", "Nanobrewery"],
+  ["nano", "Nano Brewery"],
   ["regional", "Regional Brewery"],
   ["brewpub", "Brewpub"],
-  ["large", "Large Brewery"],
-  ["planning", "Planning Brewery"],
+  ["large", "Large Brewery, likely not open for visitors"],
+  ["planning", "Not open to the public"],
   ["bar", "Bar"],
-  ["contract", "Contract Brewery"],
-  ["proprietor", "Proprietor Brewery"],
-  ["closed", "Closed Brewery"],
+  ["contract", "Brewery under Contract"],
+  ["proprietor", "Brewery Incubator"],
+  ["closed", "Permanently Closed"],
 ]);
 
 const formatPhone = (phone: string) =>
