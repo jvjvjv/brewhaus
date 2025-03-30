@@ -22,7 +22,6 @@ export async function useWebsiteMetadata(
   const allMeta =
     /<meta (?:http-equiv|itemprop|property|name)="(?<prop>(?:og|twitter)?[^"]+?)" content="(?<content>[^"]+)(?!\\)"[^>]*?>/g;
   const matches = response.matchAll(allMeta);
-  console.log(response, matches);
   if (!matches) {
     result.status = "empty";
     return result;

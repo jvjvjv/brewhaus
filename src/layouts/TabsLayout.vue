@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref, onMounted, onBeforeUnmount } from "vue";
 import { useRoute } from "vue-router";
+import store from "@/store";
 
 import {
   IonTabBar,
@@ -10,10 +11,15 @@ import {
   IonIcon,
   IonPage,
   IonRouterOutlet,
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonTitle,
+  IonButton,
 } from "@ionic/vue";
 import {
-  beer,
-  beerOutline,
+  home,
+  homeOutline,
   search,
   searchOutline,
   peopleCircle,
@@ -22,16 +28,29 @@ import {
 
 import type { INavigationTab } from "@/types";
 
-const route = useRoute();
+const pageRef = ref<typeof IonPage | null>(null);
+const ro = new ResizeObserver((entries) => {
+  for (const entry of entries) {
+    store.dispatch("setScreenSizeByWidth", entry.contentRect.width);
+  }
+});
+onMounted(() => {
+  if (pageRef.value) {
+    ro.observe(pageRef.value.$el);
+  }
+});
 
-const chooseIcon = (path: string, activeIcon: string, inactiveIcon: string) =>
-  route.path == path ? activeIcon : inactiveIcon;
+onBeforeUnmount(() => {
+  if (pageRef.value) {
+    ro.unobserve(pageRef.value.$el);
+  }
+});
 
-const tabs = computed(
+const navItems = computed(
   (): Array<INavigationTab> => [
     {
       name: "home",
-      icon: chooseIcon("/home", beer, beerOutline),
+      icon: chooseIcon("/home", home, homeOutline),
       label: "Home",
     },
     {
@@ -46,18 +65,24 @@ const tabs = computed(
     },
   ]
 );
+
+const route = useRoute();
+const chooseIcon = (path: string, activeIcon: string, inactiveIcon: string) =>
+  route.path == path ? activeIcon : inactiveIcon;
 </script>
 
 <template>
-  <ion-page>
-    <ion-tabs>
-      <ion-router-outlet></ion-router-outlet>
-      <ion-tab-bar slot="bottom">
+  <ion-page ref="pageRef">
+    <ion-tabs v-if="['xs', 'sm'].includes(store.getters.screenSize)">
+      <ion-router-outlet />
+      <ion-tab-bar
+        slot="bottom"
+        class="ion-hide-md-up"
+      >
         <ion-tab-button
-          v-for="tab in tabs"
+          v-for="tab in navItems"
           :key="tab.name"
-          :tab="tab.name"
-          :href="`/${tab.name}`"
+          @click="$router.push(`/${tab.name}`)"
         >
           <ion-icon
             aria-hidden="true"
@@ -67,5 +92,28 @@ const tabs = computed(
         </ion-tab-button>
       </ion-tab-bar>
     </ion-tabs>
+    <template v-else>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Brewhaus!</ion-title>
+          <ion-buttons slot="end">
+            <ion-button
+              v-for="button in navItems"
+              :key="button.name"
+              @click="$router.push(`/${button.name}`)"
+              aria-label="Navigate to {{ button.label }}"
+            >
+              <ion-icon
+                :icon="button.icon"
+                aria-hidden="true"
+              />
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <div class="ion-padding">
+        <ion-router-outlet />
+      </div>
+    </template>
   </ion-page>
 </template>

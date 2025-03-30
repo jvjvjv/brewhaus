@@ -82,7 +82,6 @@ const doSearchBy = async (e: SearchbarCustomEvent) => {
 const doSearchByLocation = async () => {
   try {
     const pos = await gps?.getCurrentPosition();
-    console.log(pos);
     const results = await getBreweries({
       page: searchPage.value,
       by_dist: {
@@ -121,7 +120,11 @@ const doSelect = async (brewery: IBrewery) => {
         brewery.website_url
       );
       selectedBreweryFailedToFetch.value = status == "error";
-      if (description) selectedBrewery.value.description = [description];
+      if (description) {
+        selectedBrewery.value.description = [description];
+      } else {
+        selectedBrewery.value.description = await getIpsum();
+      }
       if (image) selectedBrewery.value.image = image;
       return;
     } catch (e) {
