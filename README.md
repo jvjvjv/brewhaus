@@ -18,9 +18,16 @@ This website features:
 
 ## Development
 
-When developing, open two terminal windows. In the first, run `npm run dev` for the local UI server.When a file in the source code is changed either the component or the whole page is reloaded. This is dependent on which file has been changed. Sometimes destructive changes force a full page reload.
+```bash
+npm run dev
+npm run devapi
+```
 
-In the second terminal window, run `npm run devapi` for the express.js server used to fetch website metadata.
+For development, open two terminal windows.
+
+In the first, run `npm run dev` for the local UI server. In the second terminal window, run `npm run devapi` for the express.js server. You can point to [http://localhost:5173](http://localhost:5173) to access the local dev instance in your browser.
+
+When a file in the `src` directory is changed the browser page will automatically reload. If the lightweight API source code is changed, `npm run devapi` must be closed and restarted.
 
 ## Build for Production
 
@@ -46,13 +53,14 @@ Brewhaus could not come together without the help of the following packages:
 - [Open Brewery DB](https://www.openbrewerydb.org/) - A free dataset and API with public information on breweries, cideries, brewpubs, and bottleshops!
 - [Ionic](https://ionicframework.com/) - An open source UI toolkit for building performant, high-quality mobile apps using web technologies.
 - [Axios](https://axios-http.com/docs/api_intro) - The most widely-used HTTP client for node.js<sup>&dagger;</sup>!
+- [express.js](https://expressjs.com) - A lightweight node.js webserver, great for mocking APIs or getting around CORs.
 - [Bacon Ipsum](https://baconipsum.com/json-api/) - For a more _inspired_ placeholder text.
 
 ## Imagery
 
 - https://unsplash.com/photos/people-inside-buildings-WzPdP9pn7go
-- https://unsplash.com/photos/clear-drinking-glass-with-beer-2UsNF4Az-Ko
 - https://unsplash.com/photos/four-women-holding-drinks-while-laughing-together-during-daytime-nYgy58eb9aw
+- ~~https://unsplash.com/photos/clear-drinking-glass-with-beer-2UsNF4Az-Ko~~
 
 ---
 
