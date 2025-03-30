@@ -18,9 +18,9 @@ This website features:
 
 ## Development
 
-When developing, open a terminal window and run `npm run dev` to load a local dev server. When a file in the source code is changed either the component or the whole page is reloaded. This is dependent on which file has been changed. Sometimes destructive changes force a full page reload.
+When developing, open two terminal windows. In the first, run `npm run dev` for the local UI server.When a file in the source code is changed either the component or the whole page is reloaded. This is dependent on which file has been changed. Sometimes destructive changes force a full page reload.
 
-When developing for iOS or Android,
+In the second terminal window, run `npm run devapi` for the express.js server used to fetch website metadata.
 
 ## Build for Production
 

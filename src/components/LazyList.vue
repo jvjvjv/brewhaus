@@ -2,6 +2,7 @@
 import type { InfiniteScrollCustomEvent } from "@ionic/vue";
 import {
   IonList,
+  IonLabel,
   IonItem,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
@@ -14,23 +15,25 @@ defineProps<{
 }>();
 </script>
 <template>
-  <ion-list>
-    <ion-item
-      v-for="item in items"
-      :key="item.id"
-      @click="$emit('item-click', item)"
+  <div>
+    <ion-list>
+      <ion-item
+        v-for="item in items"
+        :key="item.id"
+        @click="$emit('item-click', item)"
+      >
+        <ion-label>
+          <slot :item="item" />
+        </ion-label>
+      </ion-item>
+    </ion-list>
+    <ion-infinite-scroll
+      :disabled="disableInfiniteScroll"
+      @ionInfinite="onLoadData"
     >
-      <ion-label>
-        <slot :item="item" />
-      </ion-label>
-    </ion-item>
-  </ion-list>
-  <ion-infinite-scroll
-    :disabled="disableInfiniteScroll"
-    @ionInfinite="onLoadData"
-  >
-    <ion-infinite-scroll-content
-      loadingSpinner="bubbles"
-    ></ion-infinite-scroll-content>
-  </ion-infinite-scroll>
+      <ion-infinite-scroll-content
+        loadingSpinner="bubbles"
+      ></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </div>
 </template>

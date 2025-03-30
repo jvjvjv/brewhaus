@@ -2,6 +2,7 @@
   "name": "brewhaus",
   "version": "1.0.0",
   "description": "Plan ahead next time. Find local breweries and see what's on tap!",
+  "type": "module",
   "keywords": [
     "node.js",
     "vue",
@@ -11,6 +12,7 @@
   ],
   "scripts": {
     "dev": "vite",
+    "devapi": "node getwebsiteapi/index.js",
     "build": "vue-tsc && vite build",
     "preview": "vite preview",
     "test:e2e": "cypress run",
@@ -30,6 +32,7 @@
     "@ionic/vue": "^8.0.0",
     "@ionic/vue-router": "^8.0.0",
     "axios": "^1.8.4",
+    "express": "^4.21.2",
     "ionicons": "^7.0.0",
     "vue": "^3.3.0",
     "vue-router": "^4.2.0",
