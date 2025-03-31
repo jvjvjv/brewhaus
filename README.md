@@ -45,6 +45,14 @@ A few issues were found that have not been addressed for this iteration and are 
 - API distance feature does not limit by distance, and this app does not triangulate locations or calculate that information.
 - API city search does not accept state or providence.
 - API does not return image of the brewery or a description. What is in place is not a very smart way to handle images or website copy because of CORS limitations. Spinning up an API using express.js or similar would be a smarter solution.
+  - This has been addressed by the `devapi` server, but it is not a permanent solution.
+
+## Future plans
+
+- Ionic is good for hybrid mobile apps and PWAs target small screens, but do not work for desktop-focused sites. To that end, Ionic will be replaced with a different Vue-based framework, e.g. PrimeVue or Quasar.
+- A more robust API server will be created to act as a proxy to the Open Brewery DB API, as well as (once found) a data source that can include current brews for a website.
+- Authentication and user accounts will be added to allow users to save their favorite breweries, beers, and connect with like-minded users.
+- Review known issues and address some of them for a better user experience.
 
 ## Open Source Packages
 

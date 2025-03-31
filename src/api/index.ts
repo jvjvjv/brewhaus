@@ -38,6 +38,7 @@ export const getBreweries = async (
 export const searchBreweries = async (query: string): Promise<IBrewery[]> =>
   await apiCall("get", `breweries/search?query=${query}`);
 
+// Utilizes a separate server to fetch the website, bypassing CORS issues.
 export const getWebsite = async (url: string): Promise<string> => {
   const response = await fetch(
     `/api/getwebsite?url=${encodeURIComponent(url)}`,
@@ -54,6 +55,7 @@ export const getWebsite = async (url: string): Promise<string> => {
   ``;
 };
 
+// Used as placeholder text for when a website cannot be fetched.
 export const getIpsum = async (): Promise<string[]> =>
   await apiCall<string[]>(
     "get",
