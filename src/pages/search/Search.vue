@@ -106,7 +106,7 @@ const doInfinite = async (e: InfiniteScrollCustomEvent) => {
     }
     breweries.value.push(...results);
   } catch(e) {
-    pageError.value = "Error fetching breweries:" + (e as Error).message;
+    pageError.value = "Error fetching breweries: " + (e as Error).message;
   } finally {
     e.target.complete();
   }
