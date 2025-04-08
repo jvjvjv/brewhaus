@@ -96,15 +96,20 @@ const doSearchByLocation = async () => {
 };
 
 const doInfinite = async (e: InfiniteScrollCustomEvent) => {
-  searchPage.value += 1;
-  const results = await getBreweries(searchQuery.value);
-  if (results.length === 0) {
+  searchPage.value += 1; 
+  try {
+    const results = await getBreweries(searchQuery.value);
+    if (results.length === 0) {
+      e.target.complete();
+      disableInfiniteScroll.value = true;
+      return;
+    }
+    breweries.value.push(...results);
+  } catch(e) {
+    pageError.value = "Error fetching breweries:" + (e as Error).message;
+  } finally {
     e.target.complete();
-    disableInfiniteScroll.value = true;
-    return;
   }
-  breweries.value.push(...results);
-  e.target.complete();
 };
 
 const doSelect = async (brewery: IBrewery) => {

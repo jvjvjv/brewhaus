@@ -14,22 +14,23 @@ const apiCall = async <T>(
   url: string,
   body?: unknown
 ): Promise<T> => {
-  const response = await axios<T>({
-    ...options,
-    method,
-    url,
-    data: body,
-  });
   try {
+    const response = await axios<T>({
+      ...options,
+      method,
+      url,
+      data: body,
+    });
     if (response.status !== 200) {
       // There should be more to this, but for now throwing an error should suffice
       throw new Error(`Error: ${response.status}`);
     }
+    return response.data;
   } catch (err) {
     const e = err as AxiosError;
     throw new Error(`Error: ${e.message}`);
   }
-  return response.data;
+
 };
 
 export const getBrewery = (id: string): Promise<IBrewery> =>
