@@ -49,9 +49,9 @@ const searchQuery = computed(() => ({
   page: searchPage.value,
   [searchBy.value == "name"
     ? "by_name"
-    : /[^\d]/.test(searchTerm.value)
-    ? "by_city"
-    : "postal"]: searchTerm.value,
+    : /^\d{5}(?:-\d{4})?$/.test(searchTerm.value)
+    ? "by_postal"
+    : "by_city"]: searchTerm.value,
 }));
 const breweries = ref<IBrewery[]>([]);
 const selectedBrewery = ref<IBrewery | null>(null);
