@@ -49,9 +49,9 @@ const searchQuery = computed(() => ({
   page: searchPage.value,
   [searchBy.value == "name"
     ? "by_name"
-    : /^[A-Za-z0-9\- ]{2,10}$/.test(searchTerm.value)
-    ? "by_postal"
-    : "by_city"]: searchTerm.value,
+    : /[^\d]/.test(searchTerm.value)
+    ? "by_city"
+    : "postal"]: searchTerm.value,
 }));
 const breweries = ref<IBrewery[]>([]);
 const selectedBrewery = ref<IBrewery | null>(null);
@@ -171,7 +171,6 @@ const doSelect = async (brewery: IBrewery) => {
       />
       Search near you
     </ion-button>
-
     <lazy-List
       v-if="breweries.length"
       :items="breweries"

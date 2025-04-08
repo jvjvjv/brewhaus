@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { AxiosRequestConfig } from "axios";
+import type { AxiosError, AxiosRequestConfig } from "axios";
 
 import type { IBrewery, IBreweryQuery } from "@/types";
 
@@ -20,23 +20,28 @@ const apiCall = async <T>(
     url,
     data: body,
   });
-  if (response.status !== 200) {
-    // There should be more to this, but for now throwing an error should suffice
-    throw new Error(`Error: ${response.status}`);
+  try {
+    if (response.status !== 200) {
+      // There should be more to this, but for now throwing an error should suffice
+      throw new Error(`Error: ${response.status}`);
+    }
+  } catch (err) {
+    const e = err as AxiosError;
+    throw new Error(`Error: ${e.message}`);
   }
   return response.data;
 };
 
-export const getBrewery = async (id: string): Promise<IBrewery> =>
-  await apiCall<IBrewery>("get", `breweries/${id}`);
+export const getBrewery = (id: string): Promise<IBrewery> =>
+  apiCall<IBrewery>("get", `breweries/${id}`);
 
-export const getBreweries = async (
+export const getBreweries = (
   queries?: IBreweryQuery
 ): Promise<IBrewery[]> =>
-  await apiCall("get", `breweries${getApiQueryString(queries ?? {})}`);
+  apiCall("get", `breweries${getApiQueryString(queries ?? {})}`);
 
-export const searchBreweries = async (query: string): Promise<IBrewery[]> =>
-  await apiCall("get", `breweries/search?query=${query}`);
+export const searchBreweries = (query: string): Promise<IBrewery[]> =>
+  apiCall("get", `breweries/search?query=${query}`);
 
 // Utilizes a separate server to fetch the website, bypassing CORS issues.
 export const getWebsite = async (url: string): Promise<string> => {
