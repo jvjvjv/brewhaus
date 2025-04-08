@@ -28,7 +28,8 @@ const apiCall = async <T>(
     return response.data;
   } catch (err) {
     const e = err as AxiosError;
-    throw new Error(`Error: ${e.message}`);
+    const statusCode = e.response?.status ? ` (Status: ${e.response.status})` : "";
+    throw new Error(`Error: ${e.message}${statusCode}`);
   }
 
 };
