@@ -49,7 +49,7 @@ const searchQuery = computed(() => ({
   page: searchPage.value,
   [searchBy.value == "name"
     ? "by_name"
-    : /^[A-Za-z0-9\- ]{2,10}$/.test(searchTerm.value)
+    : /^\d{5}(?:-\d{4})?$/.test(searchTerm.value)
     ? "by_postal"
     : "by_city"]: searchTerm.value,
 }));
@@ -96,15 +96,20 @@ const doSearchByLocation = async () => {
 };
 
 const doInfinite = async (e: InfiniteScrollCustomEvent) => {
-  searchPage.value += 1;
-  const results = await getBreweries(searchQuery.value);
-  if (results.length === 0) {
+  searchPage.value += 1; 
+  try {
+    const results = await getBreweries(searchQuery.value);
+    if (results.length === 0) {
+      e.target.complete();
+      disableInfiniteScroll.value = true;
+      return;
+    }
+    breweries.value.push(...results);
+  } catch(e) {
+    pageError.value = "Error fetching breweries: " + (e as Error).message;
+  } finally {
     e.target.complete();
-    disableInfiniteScroll.value = true;
-    return;
   }
-  breweries.value.push(...results);
-  e.target.complete();
 };
 
 const doSelect = async (brewery: IBrewery) => {
@@ -171,7 +176,6 @@ const doSelect = async (brewery: IBrewery) => {
       />
       Search near you
     </ion-button>
-
     <lazy-List
       v-if="breweries.length"
       :items="breweries"
