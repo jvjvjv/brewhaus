@@ -41,7 +41,7 @@ A few issues were found that have not been addressed for this iteration and are 
   - The issue of a potentially undefined parameter can be resolved by a simple refactor, but should the ApiQuery module be transported and used elsewhere, it would still have to be handled.
 - There is no user feedback when "Search near me" has been clicked or when any API request is in progress.
 - Code formatting is not pretty and no steps have been taken to include any formatting rules yet.
-- Postal code matching is _very_ generic and will even run a search based on a partial ZIP code.
+- Postal code only matches against US ZIP codes. If this app is expected to be used outside of the US, the postal code Regex pattern will require enhancement to include other countries.
 - API distance feature does not limit by distance, and this app does not triangulate locations or calculate that information.
 - API city search does not accept state or providence.
 - API does not return image of the brewery or a description. What is in place is not a very smart way to handle images or website copy because of CORS limitations. Spinning up an API using express.js or similar would be a smarter solution.
